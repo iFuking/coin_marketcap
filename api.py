@@ -6,9 +6,8 @@ from flask_restful import Resource, Api
 import sys, logging
 
 from mysql_tables import app
-import utils, market_trading, trading_pair
+import utils, market_trading, trading_pair, pair_history
 from utils import logger, token_in_usd, token_names
-from market_trading import get_market_trading
 
 
 api = Api(app)
@@ -69,6 +68,11 @@ def api_trading_pair():
 
     return trading_pair.trading_pair_json_to_csv(l)
     # return json.dumps(l)
+
+@app.route('/pair_history')
+def api_pair_history():
+    pair_history.get_all_tokens_trading_pairs()
+    return ''
 
 @app.route('/tokens')
 def api_token_names():
