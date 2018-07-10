@@ -82,6 +82,7 @@ def write_trading_pairs_to_db():
             db.session.commit()
             print 'done with record:', record
 
+    global timer
     timer = threading.Timer(24 * 60 * 60, write_trading_pairs_to_db)
     timer.start()
     return

@@ -107,6 +107,12 @@ def api_pair_history():
     return pair_history.pair_history_json_to_csv(l)
 
 
+@app.route('/start_timer')
+def api_start_timer():
+    pair_history.write_trading_pairs_to_db()
+    return ''
+
+
 @app.route('/tokens')
 def api_token_names():
     return json.dumps(token_names) + '\n'
@@ -127,8 +133,5 @@ if __name__ == '__main__':
     ch.setFormatter(formatter)
     # add the handlers to the logger
     logger.addHandler(ch)
-
-    timer = threading.Timer(1, pair_history.write_trading_pairs_to_db)
-    timer.start()
 
     app.run(debug=True)
