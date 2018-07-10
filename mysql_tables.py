@@ -15,7 +15,7 @@ class Trading_pair(db.Model):
     token = db.Column('token', String(25))
     date = db.Column('date', String(10))
     rank = db.Column('rank', Integer)
-    source = db.Column('source', String(15))
+    source = db.Column('source', String(30))
     pair = db.Column('pair', String(15))
     volume = db.Column('volume', Integer)
     price = db.Column('price', Float)
