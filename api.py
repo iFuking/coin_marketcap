@@ -4,13 +4,14 @@
 from flask import Flask, url_for, request, json
 from flask_restful import Resource, Api
 import sys, logging
+import threading
 
 from mysql_tables import app
 import utils, market_trading, trading_pair, pair_history
 from utils import logger, token_in_usd, token_names
 
-
 api = Api(app)
+
 
 @app.route('/market_trading')
 def api_market_trading():
@@ -22,7 +23,8 @@ def api_market_trading():
             return utils.token_not_exists_err(token)
 
         try:
-            url = 'https://coinmarketcap.com/currencies/%s/historical-data/?start=%s&end=%s' % (token, date, date)
+            url = 'https://coinmarketcap.com/currencies/%s/historical-data/?start=%s&end=%s' % (
+                token, date, date)
             l = market_trading.get_market_trading(url, token)
         except Exception, e:
             print e
@@ -34,7 +36,8 @@ def api_market_trading():
             return utils.token_not_exists_err(token)
 
         try:
-            url = 'https://coinmarketcap.com/currencies/%s/historical-data/?start=%s&end=%s' % (token, start_date, end_date)
+            url = 'https://coinmarketcap.com/currencies/%s/historical-data/?start=%s&end=%s' % (
+                token, start_date, end_date)
             l = market_trading.get_market_trading(url, token)
         except Exception, e:
             print e
@@ -44,9 +47,11 @@ def api_market_trading():
         token_in_usd['usd'] = 1
         token_in_usd['btc'] = market_trading.get_btc_or_eth_in_usd('bitcoin')
         token_in_usd['eth'] = market_trading.get_btc_or_eth_in_usd('ethereum')
-        market_trading.get_market_trading_in_btc_or_eth(l, float(token_in_usd[type]))
+        market_trading.get_market_trading_in_btc_or_eth(
+            l, float(token_in_usd[type]))
     return market_trading.trading_market_json_to_csv(l)
-    # return json.dumps(l)
+# return json.dumps(l)
+
 
 @app.route('/trading_pair')
 def api_trading_pair():
@@ -67,20 +72,50 @@ def api_trading_pair():
             print e
 
     return trading_pair.trading_pair_json_to_csv(l)
-    # return json.dumps(l)
+# return json.dumps(l)
+
 
 @app.route('/pair_history')
 def api_pair_history():
-    pair_history.get_all_tokens_trading_pairs()
-    return ''
+    if 'date' in request.args:
+        date = request.args['date']
+        token = 'all'
+        topk = 5
+
+        if 'token' in request.args:
+            token = request.args['token']
+            if token not in token_names:
+                return utils.token_not_exists_err(token)
+        if 'topk' in request.args:
+            topk = request.args['topk']
+        l = pair_history.read_trading_pairs_from_db(date, date, token, int(topk))
+
+    elif 'start_date' in request.args and 'end_date' in request.args:
+        start_date = request.args['start_date']
+        end_date = request.args['end_date']
+        token = 'all'
+        topk = 5
+
+        if 'token' in request.args:
+            token = request.args['token']
+            if token not in token_names:
+                return utils.token_not_exists_err(token)
+        if 'topk' in request.args:
+            topk = request.args['topk']
+        l = pair_history.read_trading_pairs_from_db(start_date, end_date, token, int(topk))
+
+    return pair_history.pair_history_json_to_csv(l)
+
 
 @app.route('/tokens')
 def api_token_names():
     return json.dumps(token_names) + '\n'
 
+
 @app.route('/hello')
 def api_hello():
     return 'hello\n'
+
 
 if __name__ == '__main__':
     # create Stream Handler.
@@ -92,5 +127,8 @@ if __name__ == '__main__':
     ch.setFormatter(formatter)
     # add the handlers to the logger
     logger.addHandler(ch)
+
+    timer = threading.Timer(1, pair_history.write_trading_pairs_to_db)
+    timer.start()
 
     app.run(debug=True)

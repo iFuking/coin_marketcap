@@ -1,4 +1,3 @@
-
 from bs4 import BeautifulSoup
 import urllib, urllib2
 import logging
@@ -8,6 +7,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 user_agent = 'Mozilla/5.0 (Linux; U; Android 4.0.3; ko-kr; LG-L160L Build/IML74K) AppleWebkit/534.30 (KHTML, like Gecko) Version/4.0 Mobile Safari/534.30'
+
 
 def get_soup_by_url(url):
     success = True
@@ -19,8 +19,10 @@ def get_soup_by_url(url):
         success = False
         raise e
 
+
 def similar(a, b):
     return SequenceMatcher(None, a, b).ratio()
+
 
 def token_not_exists_err(token):
     most_sim = 0
@@ -32,6 +34,7 @@ def token_not_exists_err(token):
             most_sim = sim
             token_name = name
     return 'token \'' + token + '\' not in token name set, do you mean: \'%s\'?\n' % token_name
+
 
 def get_token_names():
     l = list()
@@ -45,6 +48,6 @@ def get_token_names():
         print e
     return l
 
+
 token_names = get_token_names()
 token_in_usd = dict()
-

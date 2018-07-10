@@ -1,22 +1,25 @@
-
 from bs4 import BeautifulSoup
 import utils
 import json, csv
+
 
 def get_trading_pairs(url, topk=5):
     print url
     l = list()
     soup = utils.get_soup_by_url(url)
-    records = soup.find('table', id='markets-table').find('tbody').find_all('tr')
+    records = soup.find(
+        'table', id='markets-table').find('tbody').find_all('tr')
     cnt = 1
     for record in records:
         fields = record.find_all('td')
-        rank = fields[0].text.replace('\n','')
-        source = fields[1].text.replace('\n','')
-        pair = fields[2].text.replace('\n','')
-        volume = fields[3].text.replace('\n','').replace(',','').replace('$','')
-        price = fields[4].text.replace('\n','').replace(',','').replace('$','')
-        percent = fields[5].text.replace('\n','')
+        rank = fields[0].text.replace('\n', '')
+        source = fields[1].text.replace('\n', '')
+        pair = fields[2].text.replace('\n', '')
+        volume = fields[3].text.replace('\n', '').replace(',', '').replace(
+            '$', '')
+        price = fields[4].text.replace('\n', '').replace(',', '').replace(
+            '$', '')
+        percent = fields[5].text.replace('\n', '')
 
         d = {
             'rank': rank,
@@ -34,6 +37,7 @@ def get_trading_pairs(url, topk=5):
         cnt = cnt + 1
     return l
 
+
 def trading_pair_json_to_csv(rows):
     csv_str = 'rank,source,pair,price,volume,volume_percentage\n'
     for r in rows:
@@ -44,5 +48,3 @@ def trading_pair_json_to_csv(rows):
         csv_str += (str(r['volume']) + ',')
         csv_str += (str(r['percent']) + '\n')
     return csv_str
-
-
