@@ -79,6 +79,7 @@ def api_trading_pair():
 def api_pair_history_sum():
     token = 'all'
     topk = 5
+    l = list()
 
     if 'date' in request.args:
         date = request.args['date']
@@ -94,7 +95,7 @@ def api_pair_history_sum():
         l = pair_history.read_trading_pairs_sum_from_db(date, date, token, int(topk))
 
     elif 'start_date' in request.args and 'end_date' in request.args:
-        start_date = request.args['start_date']
+        # start_date = request.args['start_date']
         end_date = request.args['end_date']
 
         if 'token' in request.args:
@@ -113,6 +114,7 @@ def api_pair_history():
     token = 'all'
     k = 1
     topk = 5
+    l = list()
 
     if 'date' in request.args:
         date = request.args['date']
