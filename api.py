@@ -75,8 +75,11 @@ def api_trading_pair():
 # return json.dumps(l)
 
 
-@app.route('/pair_history')
-def api_pair_history():
+@app.route('/pair_history_sum')
+def api_pair_history_sum():
+    token = 'all'
+    topk = 5
+
     if 'date' in request.args:
         date = request.args['date']
         token = 'all'
@@ -88,13 +91,11 @@ def api_pair_history():
                 return utils.token_not_exists_err(token)
         if 'topk' in request.args:
             topk = request.args['topk']
-        l = pair_history.read_trading_pairs_from_db(date, date, token, int(topk))
+        l = pair_history.read_trading_pairs_sum_from_db(date, date, token, int(topk))
 
     elif 'start_date' in request.args and 'end_date' in request.args:
         start_date = request.args['start_date']
         end_date = request.args['end_date']
-        token = 'all'
-        topk = 5
 
         if 'token' in request.args:
             token = request.args['token']
@@ -102,7 +103,45 @@ def api_pair_history():
                 return utils.token_not_exists_err(token)
         if 'topk' in request.args:
             topk = request.args['topk']
-        l = pair_history.read_trading_pairs_from_db(start_date, end_date, token, int(topk))
+        l = pair_history.read_trading_pairs_sum_from_db(start_date, end_date, token, int(topk))
+
+    return pair_history.pair_history_sum_json_to_csv(l)
+
+
+@app.route('/pair_history')
+def api_pair_history():
+    token = 'all'
+    k = 1
+    topk = 5
+
+    if 'date' in request.args:
+        date = request.args['date']
+
+        if 'token' in request.args:
+            token = request.args['token']
+            if token not in token_names:
+                return utils.token_not_exists_err(token)
+        if 'topk' in request.args:
+            topk = request.args['topk']
+            l = pair_history.read_trading_pair_from_db_with_topk(date, date, token, int(topk))
+        elif 'k' in request.args:
+            k = request.args['k']
+            l = pair_history.read_trading_pair_from_db_with_k(date, date, token, int(k))
+
+    elif 'start_date' in request.args and 'end_date' in request.args:
+        start_date = request.args['start_date']
+        end_date = request.args['end_date']
+
+        if 'token' in request.args:
+            token = request.args['token']
+            if token not in token_names:
+                return utils.token_not_exists_err(token)
+        if 'topk' in request.args:
+            topk = request.args['topk']
+            l = pair_history.read_trading_pair_from_db_with_topk(start_date, end_date, token, int(topk))
+        elif 'k' in request.args:
+            k = request.args['k']
+            l = pair_history.read_trading_pair_from_db_with_k(start_date, end_date, token, int(k))
 
     return pair_history.pair_history_json_to_csv(l)
 

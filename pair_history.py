@@ -88,7 +88,7 @@ def write_trading_pairs_to_db():
     return
 
 
-def pair_history_json_to_csv(rows):
+def pair_history_sum_json_to_csv(rows):
     csv_str = 'rank,pair,volume\n'
     for r in rows:
         csv_str += (str(r['rank']) + ',')
@@ -97,7 +97,7 @@ def pair_history_json_to_csv(rows):
     return csv_str
 
 
-def read_trading_pairs_from_db(start_date, end_date, token='all', topk=5):
+def read_trading_pairs_sum_from_db(start_date, end_date, token='all', topk=5):
     if token == 'all':
         base_query = db.session.query(
             Trading_pair.pair,
@@ -127,3 +127,79 @@ def read_trading_pairs_from_db(start_date, end_date, token='all', topk=5):
             break
 
     return l
+
+
+def read_trading_pair_from_db_with_topk(start_date, end_date, token='all', topk=5):
+    if token == 'all':
+        base_query = db.session.query(
+            Trading_pair).filter(
+                Trading_pair.date >= start_date).filter(
+                    Trading_pair.date <= end_date).filter(
+                        Trading_pair.rank <= topk).order_by(
+                            Trading_pair.rank, Trading_pair.date).all()
+    else:
+        base_query = db.session.query(
+            Trading_pair).filter(
+                Trading_pair.date >= start_date).filter(
+                    Trading_pair.date <= end_date).filter(
+                        Trading_pair.token == token).filter(
+                            Trading_pair.rank <= topk).order_by(
+                                Trading_pair.rank, Trading_pair.date).all()
+
+    l = list()
+    for res in base_query:
+        d = {
+            'date': res.date,
+            'rank': res.rank,
+            'source': res.source,
+            'pair': res.pair,
+            'volume': res.volume,
+            'price': res.price,
+            'percent': res.percent
+        }
+        l.append(d)
+    return l
+
+
+def read_trading_pair_from_db_with_k(start_date, end_date, token='all', k=1):
+    if token == 'all':
+        base_query = db.session.query(
+            Trading_pair).filter(
+                Trading_pair.date >= start_date).filter(
+                    Trading_pair.date <= end_date).filter(
+                        Trading_pair.rank == k).all()
+    else:
+        base_query = db.session.query(
+            Trading_pair).filter(
+                Trading_pair.date >= start_date).filter(
+                    Trading_pair.date <= end_date).filter(
+                        Trading_pair.token == token).filter(
+                            Trading_pair.rank == k).all()
+
+    l = list()
+    for res in base_query:
+        d = {
+            'date': res.date,
+            'rank': res.rank,
+            'source': res.source,
+            'pair': res.pair,
+            'volume': res.volume,
+            'price': res.price,
+            'percent': res.percent
+        }
+        l.append(d)
+    return l
+
+
+def pair_history_json_to_csv(rows):
+    csv_str = 'date,rank,source,pair,volume,price,percent\n'
+    for r in rows:
+        csv_str += (str(r['date']) + ',')
+        csv_str += (str(r['rank']) + ',')
+        csv_str += (str(r['source']) + ',')
+        csv_str += (str(r['pair']) + ',')
+        csv_str += (str(r['volume']) + ',')
+        csv_str += (str(r['price']) + ',')
+        csv_str += (str(r['percent']) + '\n')
+    return csv_str
+
