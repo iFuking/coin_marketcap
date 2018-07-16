@@ -129,6 +129,11 @@ def read_trading_pairs_sum_from_db(start_date, end_date, token='all', topk=5):
     return l
 
 
+def date_format(date):
+    date = str(date)
+    return date[:4] + '/' + date[4:6] + '/' + date[6:]
+
+
 def read_trading_pair_from_db_with_topk(start_date, end_date, token='all', topk=5):
     if token == 'all':
         base_query = db.session.query(
@@ -149,7 +154,7 @@ def read_trading_pair_from_db_with_topk(start_date, end_date, token='all', topk=
     l = list()
     for res in base_query:
         d = {
-            'date': res.date,
+            'date': date_format(res.date),
             'rank': res.rank,
             'source': res.source,
             'pair': res.pair,
@@ -179,7 +184,7 @@ def read_trading_pair_from_db_with_k(start_date, end_date, token='all', k=1):
     l = list()
     for res in base_query:
         d = {
-            'date': res.date,
+            'date': date_format(res.date),
             'rank': res.rank,
             'source': res.source,
             'pair': res.pair,
