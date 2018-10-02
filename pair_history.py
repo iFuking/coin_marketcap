@@ -37,10 +37,10 @@ def get_token_trading_pairs(url, token):
             'price': price,
             'percent': percent
         }
-        print json.dumps(d)
+        # print json.dumps(d)
         l.append(d)
 
-    print len(l)
+    # print len(l)
     return l
 
 
@@ -80,7 +80,7 @@ def write_trading_pairs_to_db():
                 percent=percent)
             db.session.add(trading_pair)
             db.session.commit()
-            print 'done with record:', record
+            # print 'done with record:', record
 
     global timer
     timer = threading.Timer(24 * 60 * 60, write_trading_pairs_to_db)
