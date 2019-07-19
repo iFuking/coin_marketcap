@@ -5,9 +5,12 @@ from mysql_tables import db, Trading_pair
 from sqlalchemy import func
 from sqlalchemy.sql import label
 
+from utils import logger
+
 
 def get_token_trading_pairs(url, token):
-    print url
+    time.sleep(3)
+    logger.info(url)
     l = list()
     soup = utils.get_soup_by_url(url)
     records = soup.find(
@@ -46,6 +49,9 @@ def get_token_trading_pairs(url, token):
 
 def get_all_tokens_trading_pairs():
     token_names = utils.get_token_names()
+    if 'nebulas-token' not in token_names:
+        token_names.append('nebulas-token')
+
     url = 'https://coinmarketcap.com'
     all_tokens_trading_pairs = list()
     for token in token_names:
@@ -58,6 +64,7 @@ def get_all_tokens_trading_pairs():
 
 def write_trading_pairs_to_db():
     all_tokens_trading_pairs = get_all_tokens_trading_pairs()
+    logger.info('done with get all tokens trading pairs')
     for trading_pairs in all_tokens_trading_pairs:
         for record in trading_pairs:
             token = record['token']

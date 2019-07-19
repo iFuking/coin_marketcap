@@ -32,8 +32,8 @@ def api_market_trading():
         start_date = request.args['start_date']
         end_date = request.args['end_date']
         token = request.args['token']
-        if token not in token_names:
-            return utils.token_not_exists_err(token)
+        # if token not in token_names:
+            # return utils.token_not_exists_err(token)
 
         try:
             url = 'https://coinmarketcap.com/currencies/%s/historical-data/?start=%s&end=%s' % (
@@ -175,4 +175,4 @@ if __name__ == '__main__':
     # add the handlers to the logger
     logger.addHandler(ch)
 
-    app.run(debug=True)
+    app.run(host='127.0.0.1', port='6002', threaded=True, debug=True)
